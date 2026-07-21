@@ -4,7 +4,7 @@ A modern, high-contrast, monochrome personal blogging web application designed f
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 - **Minimalist Black & White Design**: High-contrast, typography-focused editorial layout for clean reading and navigation.
 - **Post Discovery & Tag Filtering**: Easily browse articles and filter content by topics and tags.
@@ -16,7 +16,7 @@ A modern, high-contrast, monochrome personal blogging web application designed f
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 To run the application locally:
 
@@ -38,7 +38,7 @@ Once started, open [http://localhost:5173](http://localhost:5173) in your browse
 
 ---
 
-## 📖 User Guide
+## User Guide
 
 ### 1. Reading & Exploring
 - **Browse Articles**: View the latest posts on the home page.
