@@ -1,28 +1,13 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const Question = require('../models/Question');
 const Answer = require('../models/Answer');
+const { requireAuth } = require('../middleware/authMiddleware');
+const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware');
 
 const router = express.Router();
 
-// Helper middleware to require authentication (user or admin)
-function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'defaultsecret');
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
-}
-
 // GET all questions, optional ?tag=xyz filter
-router.get('/', async (req, res) => {
+router.get('/', apiLimiter, requireAuth, async (req, res) => {
   try {
     const filter = req.query.tag ? { tags: req.query.tag } : {};
     const questions = await Question.find(filter).sort({ createdAt: -1 });
@@ -33,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET all distinct tags from questions
-router.get('/tags', async (req, res) => {
+router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
   try {
     const tags = await Question.distinct('tags');
     res.json(tags);
@@ -43,7 +28,7 @@ router.get('/tags', async (req, res) => {
 });
 
 // GET a single question
-router.get('/:id', async (req, res) => {
+router.get('/:id', apiLimiter, requireAuth, async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
     if (!question) return res.status(404).json({ message: 'Question not found' });
@@ -54,7 +39,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE a question (requires login)
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', writeLimiter, requireAuth, async (req, res) => {
   try {
     const { title, content, tags } = req.body;
     if (!title || !content) {
@@ -74,7 +59,7 @@ router.post('/', requireAuth, async (req, res) => {
 });
 
 // DELETE a question (requires admin or question owner)
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', writeLimiter, requireAuth, async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
     if (!question) return res.status(404).json({ message: 'Question not found' });
@@ -93,7 +78,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 // GET answers for a question
-router.get('/:id/answers', async (req, res) => {
+router.get('/:id/answers', apiLimiter, requireAuth, async (req, res) => {
   try {
     const answers = await Answer.find({ question: req.params.id }).sort({ createdAt: 1 });
     res.json(answers);
@@ -102,10 +87,11 @@ router.get('/:id/answers', async (req, res) => {
   }
 });
 
-// POST an answer to a question (no login required, just username/text, same as comments)
-router.post('/:id/answers', async (req, res) => {
+// POST an answer to a question (requires login)
+router.post('/:id/answers', writeLimiter, requireAuth, async (req, res) => {
   try {
-    const { username, text } = req.body;
+    const { text } = req.body;
+    const username = req.user.username || req.body.username;
     if (!username || !text) {
       return res.status(400).json({ message: 'Username and text required' });
     }
@@ -125,7 +111,7 @@ router.post('/:id/answers', async (req, res) => {
 });
 
 // SELECT/LIKE an answer (toggles isLiked, requires login, must be author of the question or admin)
-router.post('/:id/answers/:answerId/like', requireAuth, async (req, res) => {
+router.post('/:id/answers/:answerId/like', writeLimiter, requireAuth, async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
     if (!question) return res.status(404).json({ message: 'Question not found' });
@@ -162,7 +148,7 @@ router.post('/:id/answers/:answerId/like', requireAuth, async (req, res) => {
 });
 
 // DELETE an answer (requires admin or answer author)
-router.delete('/:id/answers/:answerId', requireAuth, async (req, res) => {
+router.delete('/:id/answers/:answerId', writeLimiter, requireAuth, async (req, res) => {
   try {
     const answer = await Answer.findById(req.params.answerId);
     if (!answer) return res.status(404).json({ message: 'Answer not found' });

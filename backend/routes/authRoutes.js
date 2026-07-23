@@ -3,11 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Admin = require('../models/Admin');
+const { requireAuth } = require('../middleware/authMiddleware');
+const { authLimiter, apiLimiter } = require('../middleware/rateLimitMiddleware');
 
 const router = express.Router();
 
 // REGISTER normal user
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -45,7 +47,7 @@ router.post('/register', async (req, res) => {
 });
 
 // LOGIN user or admin
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -86,18 +88,8 @@ router.post('/login', async (req, res) => {
 });
 
 // GET current user profile
-router.get('/me', async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'defaultsecret');
-    res.json({ username: decoded.username, role: decoded.role });
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
+router.get('/me', apiLimiter, requireAuth, async (req, res) => {
+  res.json({ username: req.user.username, role: req.user.role });
 });
 
 module.exports = router;

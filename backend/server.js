@@ -24,13 +24,15 @@ app.use(async (req, res, next) => {
   }
 });
 
+const { apiLimiter } = require('./middleware/rateLimitMiddleware');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/ideas', ideaRoutes);
 
-app.get('/', (req, res) => res.send('Blog API running'));
+app.get('/', apiLimiter, (req, res) => res.send('Blog API running'));
 
 const PORT = process.env.PORT || 5000;
 

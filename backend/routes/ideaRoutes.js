@@ -1,28 +1,13 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const Idea = require('../models/Idea');
 const Suggestion = require('../models/Suggestion');
+const { requireAuth } = require('../middleware/authMiddleware');
+const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware');
 
 const router = express.Router();
 
-// Helper middleware to require authentication (user or admin)
-function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'defaultsecret');
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
-}
-
 // GET all ideas, optional ?tag=xyz filter
-router.get('/', async (req, res) => {
+router.get('/', apiLimiter, requireAuth, async (req, res) => {
   try {
     const filter = req.query.tag ? { tags: req.query.tag } : {};
     const ideas = await Idea.find(filter).sort({ createdAt: -1 });
@@ -33,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET all distinct tags from ideas
-router.get('/tags', async (req, res) => {
+router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
   try {
     const tags = await Idea.distinct('tags');
     res.json(tags);
@@ -43,7 +28,7 @@ router.get('/tags', async (req, res) => {
 });
 
 // GET a single idea
-router.get('/:id', async (req, res) => {
+router.get('/:id', apiLimiter, requireAuth, async (req, res) => {
   try {
     const idea = await Idea.findById(req.params.id);
     if (!idea) return res.status(404).json({ message: 'Idea not found' });
@@ -54,7 +39,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE an idea (requires login)
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', writeLimiter, requireAuth, async (req, res) => {
   try {
     const { title, content, tags } = req.body;
     if (!title || !content) {
@@ -74,7 +59,7 @@ router.post('/', requireAuth, async (req, res) => {
 });
 
 // DELETE an idea (requires admin or idea owner)
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', writeLimiter, requireAuth, async (req, res) => {
   try {
     const idea = await Idea.findById(req.params.id);
     if (!idea) return res.status(404).json({ message: 'Idea not found' });
@@ -92,7 +77,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 // GET suggestions for an idea
-router.get('/:id/suggestions', async (req, res) => {
+router.get('/:id/suggestions', apiLimiter, requireAuth, async (req, res) => {
   try {
     const suggestions = await Suggestion.find({ idea: req.params.id }).sort({ createdAt: 1 });
     res.json(suggestions);
@@ -101,10 +86,11 @@ router.get('/:id/suggestions', async (req, res) => {
   }
 });
 
-// POST a suggestion to an idea (no login required, just username/text, same as comments)
-router.post('/:id/suggestions', async (req, res) => {
+// POST a suggestion to an idea (requires login)
+router.post('/:id/suggestions', writeLimiter, requireAuth, async (req, res) => {
   try {
-    const { username, text } = req.body;
+    const { text } = req.body;
+    const username = req.user.username || req.body.username;
     if (!username || !text) {
       return res.status(400).json({ message: 'Username and text required' });
     }
@@ -124,7 +110,7 @@ router.post('/:id/suggestions', async (req, res) => {
 });
 
 // DELETE a suggestion (requires admin or suggestion author)
-router.delete('/:id/suggestions/:suggestionId', requireAuth, async (req, res) => {
+router.delete('/:id/suggestions/:suggestionId', writeLimiter, requireAuth, async (req, res) => {
   try {
     const suggestion = await Suggestion.findById(req.params.suggestionId);
     if (!suggestion) return res.status(404).json({ message: 'Suggestion not found' });
