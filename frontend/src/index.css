@@ -36,6 +36,7 @@ h1, h2, h3 {
   padding: 20px 24px;
   border-bottom: 2px solid var(--border);
   background: var(--bg);
+  position: relative;
 }
 
 .brand {
@@ -51,6 +52,80 @@ h1, h2, h3 {
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+/* Hamburger Button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 20px;
+  height: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger .bar {
+  width: 20px;
+  height: 2px;
+  background-color: var(--text);
+  transition: all 0.2s ease;
+}
+
+/* Hamburger animation to X */
+.hamburger .bar.open:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger .bar.open:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger .bar.open:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Responsive Navbar for Mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 24px;
+    border-bottom: 2px solid var(--border);
+    z-index: 100;
+    gap: 8px;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a, .nav-links button {
+    text-align: center;
+    width: 100%;
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+
+  .user-role-badge {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+  }
 }
 
 .user-role-badge {
