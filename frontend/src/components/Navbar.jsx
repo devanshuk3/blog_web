@@ -25,6 +25,8 @@ function Navbar() {
             <span className="user-role-badge">
               {isAdmin ? `Admin${username ? ` (${username})` : ''}` : username}
             </span>
+            <Link to="/questions">QUESTIONS</Link>
+            <Link to="/ideas">IDEAS</Link>
             {isAdmin && <Link to="/admin/new">NEW POST</Link>}
             <button type="button" onClick={logout}>SIGN OUT</button>
           </>

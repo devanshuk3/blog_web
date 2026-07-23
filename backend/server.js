@@ -6,6 +6,8 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const commentRoutes = require('./routes/commentRoutes');
+const questionRoutes = require('./routes/questionRoutes');
+const ideaRoutes = require('./routes/ideaRoutes');
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use(async (req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/questions', questionRoutes);
+app.use('/api/ideas', ideaRoutes);
 
 app.get('/', (req, res) => res.send('Blog API running'));
 
