@@ -18,7 +18,7 @@
       }
     },
     {
-      "source": "/:path((?!.*\\.).*)",
+      "source": "/((?!api|assets|favicon.ico)[^.]*)",
       "destination": {
         "type": "service",
         "service": "frontend",
