@@ -76,6 +76,32 @@ router.delete('/:id', writeLimiter, requireAuth, async (req, res) => {
   }
 });
 
+// UPDATE an idea (requires admin or idea owner)
+router.put('/:id', writeLimiter, requireAuth, async (req, res) => {
+  try {
+    const { title, content, tags } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Title and content required' });
+    }
+
+    const idea = await Idea.findById(req.params.id);
+    if (!idea) return res.status(404).json({ message: 'Idea not found' });
+
+    if (req.user.role !== 'admin' && req.user.username !== idea.username) {
+      return res.status(403).json({ message: 'Permission denied' });
+    }
+
+    idea.title = title;
+    idea.content = content;
+    idea.tags = tags ? tags.map((t) => t.trim().toLowerCase()) : [];
+    await idea.save();
+
+    res.json(idea);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET suggestions for an idea
 router.get('/:id/suggestions', apiLimiter, requireAuth, async (req, res) => {
   try {
