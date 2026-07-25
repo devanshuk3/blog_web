@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api';
+import ContentRenderer from '../components/ContentRenderer.jsx';
 
 function QuestionDetail() {
   const { id } = useParams();
@@ -158,7 +159,16 @@ function QuestionDetail() {
         <span className="date">{new Date(question.createdAt).toLocaleDateString()}</span>
       </div>
 
-      <div className="post-content">{question.content}</div>
+      <div className="post-content">
+        {question.image && (
+          <img 
+            src={question.image} 
+            alt="Attached" 
+            className="attached-image" 
+          />
+        )}
+        <ContentRenderer content={question.content} />
+      </div>
 
       <hr />
 

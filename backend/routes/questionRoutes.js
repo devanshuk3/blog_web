@@ -41,7 +41,7 @@ router.get('/:id', apiLimiter, async (req, res) => {
 // CREATE a question (requires login)
 router.post('/', writeLimiter, requireAuth, async (req, res) => {
   try {
-    const { title, content, tags } = req.body;
+    const { title, content, tags, image } = req.body;
     if (!title || !content) {
       return res.status(400).json({ message: 'Title and content required' });
     }
@@ -51,6 +51,7 @@ router.post('/', writeLimiter, requireAuth, async (req, res) => {
       content,
       username: req.user.username,
       tags: tags ? tags.map((t) => t.trim().toLowerCase()) : [],
+      image,
     });
     res.status(201).json(question);
   } catch (err) {

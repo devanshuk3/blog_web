@@ -7,6 +7,7 @@ function AdminEdit() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const [image, setImage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function AdminEdit() {
         setTitle(res.data.title);
         setContent(res.data.content);
         setTags(res.data.tags ? res.data.tags.join(', ') : '');
+        setImage(res.data.image || '');
         setError('');
       })
       .catch((err) => {
@@ -40,7 +42,7 @@ function AdminEdit() {
     setError('');
     try {
       const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
-      await api.put(`/posts/${id}`, { title, content, tags: tagList });
+      await api.put(`/posts/${id}`, { title, content, tags: tagList, image });
       navigate(`/post/${id}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Could not update post.');
@@ -65,6 +67,41 @@ function AdminEdit() {
         rows={12}
         required
       />
+      <div className="image-upload-container">
+        <label className="image-upload-label">ATTACH IMAGE (MAX 1MB)</label>
+        <input
+          type="file"
+          accept="image/*"
+          className="image-upload-input"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              if (file.size > 1024 * 1024) {
+                alert("Image must be less than 1 MB");
+                e.target.value = null;
+                return;
+              }
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setImage(reader.result);
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+        />
+        {image && (
+          <div className="image-preview-container">
+            <img src={image} alt="Preview" className="image-preview" />
+            <button
+              type="button"
+              className="remove-image-btn"
+              onClick={() => setImage('')}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+      </div>
       <input
         type="text"
         placeholder="Tags, comma separated (e.g. technical, life)"

@@ -13,6 +13,7 @@ function Ideas() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [iTags, setITags] = useState('');
+  const [image, setImage] = useState('');
   const [formError, setFormError] = useState('');
   const [showForm, setShowForm] = useState(false);
 
@@ -49,12 +50,13 @@ function Ideas() {
 
     try {
       const tagList = iTags.split(',').map((t) => t.trim()).filter(Boolean);
-      await api.post('/ideas', { title, content, tags: tagList });
+      await api.post('/ideas', { title, content, tags: tagList, image });
       
       // Reset form
       setTitle('');
       setContent('');
       setITags('');
+      setImage('');
       setShowForm(false);
       
       // Reload ideas & tags
@@ -115,6 +117,42 @@ function Ideas() {
             required
             style={{ width: '100%', resize: 'vertical' }}
           />
+          <div className="image-upload-container">
+            <label className="image-upload-label">ATTACH IMAGE (MAX 1MB)</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="image-upload-input"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  if (file.size > 1024 * 1024) {
+                    alert("Image must be less than 1 MB");
+                    e.target.value = null;
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setImage(reader.result);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              style={{ width: '100%' }}
+            />
+            {image && (
+              <div className="image-preview-container">
+                <img src={image} alt="Preview" className="image-preview" />
+                <button
+                  type="button"
+                  className="remove-image-btn"
+                  onClick={() => setImage('')}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
           <input
             type="text"
             placeholder="Tags, comma separated (e.g. web, web3, app, python)"

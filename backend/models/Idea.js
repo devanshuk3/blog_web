@@ -6,6 +6,7 @@ const ideaSchema = new mongoose.Schema(
     content: { type: String, required: true },
     username: { type: String, required: true },
     tags: [{ type: String }],
+    image: { type: String },
   },
   { timestamps: true }
 );

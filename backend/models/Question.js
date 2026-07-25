@@ -7,6 +7,7 @@ const questionSchema = new mongoose.Schema(
     username: { type: String, required: true },
     tags: [{ type: String }],
     isAnswered: { type: Boolean, default: false },
+    image: { type: String },
   },
   { timestamps: true }
 );

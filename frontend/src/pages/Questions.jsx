@@ -8,11 +8,12 @@ function Questions() {
   const [questions, setQuestions] = useState([]);
   const [tags, setTags] = useState([]);
   const [activeTag, setActiveTag] = useState(null);
-  
+
   // Ask Question form state
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [qTags, setQTags] = useState('');
+  const [image, setImage] = useState('');
   const [formError, setFormError] = useState('');
   const [showForm, setShowForm] = useState(false);
 
@@ -49,14 +50,15 @@ function Questions() {
 
     try {
       const tagList = qTags.split(',').map((t) => t.trim()).filter(Boolean);
-      await api.post('/questions', { title, content, tags: tagList });
-      
+      await api.post('/questions', { title, content, tags: tagList, image });
+
       // Reset form
       setTitle('');
       setContent('');
       setQTags('');
+      setImage('');
       setShowForm(false);
-      
+
       // Reload questions & tags
       loadQuestions();
       loadTags();
@@ -81,8 +83,8 @@ function Questions() {
       <div className="post-header-top" style={{ marginBottom: '24px' }}>
         <h1 style={{ margin: 0 }}>Questions & Answers</h1>
         {isLoggedIn ? (
-          <button 
-            className="admin-btn edit-btn" 
+          <button
+            className="admin-btn edit-btn"
             onClick={() => setShowForm(!showForm)}
             style={{ fontSize: '13px', padding: '6px 12px' }}
           >
@@ -115,6 +117,42 @@ function Questions() {
             required
             style={{ width: '100%', resize: 'vertical' }}
           />
+          <div className="image-upload-container">
+            <label className="image-upload-label">ATTACH IMAGE (MAX 1MB)</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="image-upload-input"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  if (file.size > 1024 * 1024) {
+                    alert("Image must be less than 1 MB");
+                    e.target.value = null;
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setImage(reader.result);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              style={{ width: '100%' }}
+            />
+            {image && (
+              <div className="image-preview-container">
+                <img src={image} alt="Preview" className="image-preview" />
+                <button
+                  type="button"
+                  className="remove-image-btn"
+                  onClick={() => setImage('')}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
           <input
             type="text"
             placeholder="Tags, comma separated (e.g. math, science, geography)"

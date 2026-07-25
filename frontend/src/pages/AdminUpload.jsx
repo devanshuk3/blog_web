@@ -6,6 +6,7 @@ function AdminUpload() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const [image, setImage] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -24,7 +25,7 @@ function AdminUpload() {
     setError('');
     try {
       const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
-      const res = await api.post('/posts', { title, content, tags: tagList });
+      const res = await api.post('/posts', { title, content, tags: tagList, image });
       navigate(`/post/${res.data._id}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Could not create post. Make sure you are logged in.');
@@ -49,6 +50,41 @@ function AdminUpload() {
         rows={12}
         required
       />
+      <div className="image-upload-container">
+        <label className="image-upload-label">ATTACH IMAGE (MAX 1MB)</label>
+        <input
+          type="file"
+          accept="image/*"
+          className="image-upload-input"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              if (file.size > 1024 * 1024) {
+                alert("Image must be less than 1 MB");
+                e.target.value = null;
+                return;
+              }
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setImage(reader.result);
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+        />
+        {image && (
+          <div className="image-preview-container">
+            <img src={image} alt="Preview" className="image-preview" />
+            <button
+              type="button"
+              className="remove-image-btn"
+              onClick={() => setImage('')}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+      </div>
       <input
         type="text"
         placeholder="Tags, comma separated (e.g. technical, life)"

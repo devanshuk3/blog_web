@@ -41,7 +41,7 @@ router.get('/:id', apiLimiter, async (req, res) => {
 // CREATE an idea (requires login)
 router.post('/', writeLimiter, requireAuth, async (req, res) => {
   try {
-    const { title, content, tags } = req.body;
+    const { title, content, tags, image } = req.body;
     if (!title || !content) {
       return res.status(400).json({ message: 'Title and content required' });
     }
@@ -51,6 +51,7 @@ router.post('/', writeLimiter, requireAuth, async (req, res) => {
       content,
       username: req.user.username,
       tags: tags ? tags.map((t) => t.trim().toLowerCase()) : [],
+      image,
     });
     res.status(201).json(idea);
   } catch (err) {
@@ -79,7 +80,7 @@ router.delete('/:id', writeLimiter, requireAuth, async (req, res) => {
 // UPDATE an idea (requires admin or idea owner)
 router.put('/:id', writeLimiter, requireAuth, async (req, res) => {
   try {
-    const { title, content, tags } = req.body;
+    const { title, content, tags, image } = req.body;
     if (!title || !content) {
       return res.status(400).json({ message: 'Title and content required' });
     }
@@ -94,6 +95,7 @@ router.put('/:id', writeLimiter, requireAuth, async (req, res) => {
     idea.title = title;
     idea.content = content;
     idea.tags = tags ? tags.map((t) => t.trim().toLowerCase()) : [];
+    idea.image = image;
     await idea.save();
 
     res.json(idea);

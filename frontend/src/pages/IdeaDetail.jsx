@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api';
+import ContentRenderer from '../components/ContentRenderer.jsx';
 
 function IdeaDetail() {
   const { id } = useParams();
@@ -22,11 +23,13 @@ function IdeaDetail() {
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
   const [editTags, setEditTags] = useState('');
+  const [editImage, setEditImage] = useState('');
 
   const startEditing = () => {
     setEditTitle(idea.title);
     setEditContent(idea.content);
     setEditTags(idea.tags ? idea.tags.join(', ') : '');
+    setEditImage(idea.image || '');
     setIsEditing(true);
   };
 
@@ -37,7 +40,8 @@ function IdeaDetail() {
       const res = await api.put(`/ideas/${id}`, {
         title: editTitle,
         content: editContent,
-        tags: tagList
+        tags: tagList,
+        image: editImage
       });
       setIdea(res.data);
       setIsEditing(false);
@@ -166,6 +170,41 @@ function IdeaDetail() {
             rows={12}
             required
           />
+          <div className="image-upload-container">
+            <label className="image-upload-label">ATTACH IMAGE (MAX 1MB)</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="image-upload-input"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  if (file.size > 1024 * 1024) {
+                    alert("Image must be less than 1 MB");
+                    e.target.value = null;
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setEditImage(reader.result);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            {editImage && (
+              <div className="image-preview-container">
+                <img src={editImage} alt="Preview" className="image-preview" />
+                <button
+                  type="button"
+                  className="remove-image-btn"
+                  onClick={() => setEditImage('')}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
           <input
             type="text"
             placeholder="Tags, comma separated (e.g. design, community)"
@@ -193,7 +232,16 @@ function IdeaDetail() {
             <span className="date">{new Date(idea.createdAt).toLocaleDateString()}</span>
           </div>
 
-          <div className="post-content" style={{ whiteSpace: 'pre-wrap' }}>{idea.content}</div>
+          <div className="post-content">
+            {idea.image && (
+              <img 
+                src={idea.image} 
+                alt="Attached" 
+                className="attached-image" 
+              />
+            )}
+            <ContentRenderer content={idea.content} />
+          </div>
         </>
       )}
 

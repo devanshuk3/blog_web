@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 import LikeButton from '../components/LikeButton.jsx';
 import CommentSection from '../components/CommentSection.jsx';
+import ContentRenderer from '../components/ContentRenderer.jsx';
 
 // Set to track viewed posts in this session and prevent double-incrementing on mount (due to React StrictMode or double renders)
 const viewedPostIds = new Set();
@@ -95,7 +96,16 @@ function PostPage() {
         <span className="date">{new Date(post.createdAt).toLocaleDateString()}</span>
       </div>
       <LikeButton postId={post._id} initialLikes={post.likes} />
-      <div className="post-content">{post.content}</div>
+      <div className="post-content">
+        {post.image && (
+          <img 
+            src={post.image} 
+            alt="Attached" 
+            className="attached-image" 
+          />
+        )}
+        <ContentRenderer content={post.content} />
+      </div>
       <hr />
       <CommentSection postId={post._id} />
     </div>
