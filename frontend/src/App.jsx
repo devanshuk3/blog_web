@@ -28,6 +28,13 @@ function App() {
           <Route path="/idea/:id" element={<IdeaDetail />} />
         </Routes>
       </main>
+      <div className="floating-character">
+        <img 
+          src="/cat.gif" 
+          alt="Animated Cat" 
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        />
+      </div>
     </div>
   );
 }

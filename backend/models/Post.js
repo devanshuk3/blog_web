@@ -6,6 +6,7 @@ const postSchema = new mongoose.Schema(
     content: { type: String, required: true },
     tags: [{ type: String }],
     likes: { type: Number, default: 0 },
+    views: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

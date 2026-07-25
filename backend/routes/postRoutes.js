@@ -38,6 +38,21 @@ router.get('/:id', apiLimiter, async (req, res) => {
   }
 });
 
+// POST increment view count
+router.post('/:id/view', apiLimiter, async (req, res) => {
+  try {
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+    res.json({ views: post.views });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // CREATE a post (admin only)
 router.post('/', writeLimiter, requireAdmin, async (req, res) => {
   try {

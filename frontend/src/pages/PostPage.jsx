@@ -4,6 +4,9 @@ import api from '../api';
 import LikeButton from '../components/LikeButton.jsx';
 import CommentSection from '../components/CommentSection.jsx';
 
+// Set to track viewed posts in this session and prevent double-incrementing on mount (due to React StrictMode or double renders)
+const viewedPostIds = new Set();
+
 function PostPage() {
   const { id } = useParams();
   const [post, setPost] = useState(null);
@@ -18,6 +21,17 @@ function PostPage() {
       .then((res) => {
         setPost(res.data);
         setError(null);
+
+        // Increment views count once per mount/session of this post ID
+        if (!viewedPostIds.has(id)) {
+          viewedPostIds.add(id);
+          api.post(`/posts/${id}/view`)
+            .then((viewRes) => {
+              // Update local state with the actual incremented views count
+              setPost(prev => prev ? { ...prev, views: viewRes.data.views } : prev);
+            })
+            .catch((e) => console.error('Failed to increment view count', e));
+        }
       })
       .catch((err) => {
         setError(err.response?.data?.message || 'Failed to load post');
@@ -61,6 +75,23 @@ function PostPage() {
         {post.tags && post.tags.map((tag) => (
           <span key={tag} className="tag">{tag.toUpperCase()}</span>
         ))}
+        <span className="views-badge" style={{ fontSize: '11px', padding: '3px 8px' }}>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }}
+          >
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          {post.views || 0} VIEWS
+        </span>
         <span className="date">{new Date(post.createdAt).toLocaleDateString()}</span>
       </div>
       <LikeButton postId={post._id} initialLikes={post.likes} />

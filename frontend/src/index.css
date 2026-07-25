@@ -1,9 +1,11 @@
 :root {
   --bg: #ffffff;
-  --surface: #f9f9f9;
+  --surface: #fcfbfa;
   --border: #000000;
-  --text: #000000;
-  --muted: #666666;
+  --text: #1a1a1a;
+  --muted: #6e6e6e;
+  --primary: #f05423;
+  --primary-light: #fff5f0;
 }
 
 * {
@@ -13,12 +15,18 @@
 body {
   margin: 0;
   background: var(--bg);
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
   color: var(--text);
   font-family: 'Space Mono', monospace;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: 'Playfair Display', serif;
   color: var(--text);
 }
@@ -46,6 +54,11 @@ h1, h2, h3 {
   color: var(--text);
   text-decoration: none;
   letter-spacing: -0.02em;
+  transition: color 0.15s ease;
+}
+
+.brand:hover {
+  color: var(--primary);
 }
 
 .nav-links {
@@ -113,7 +126,8 @@ h1, h2, h3 {
     display: flex;
   }
 
-  .nav-links a, .nav-links button {
+  .nav-links a,
+  .nav-links button {
     text-align: center;
     width: 100%;
     padding: 10px 12px;
@@ -138,7 +152,8 @@ h1, h2, h3 {
   color: var(--text);
 }
 
-.nav-links a, .nav-links button {
+.nav-links a,
+.nav-links button {
   text-decoration: none;
   color: var(--text);
   font-size: 13px;
@@ -152,10 +167,11 @@ h1, h2, h3 {
   transition: all 0.15s ease;
 }
 
-.nav-links a:hover, .nav-links button:hover {
-  border-color: var(--border);
-  background: var(--border);
-  color: var(--bg);
+.nav-links a:hover,
+.nav-links button:hover {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .tag-filter {
@@ -177,9 +193,11 @@ h1, h2, h3 {
   transition: all 0.15s ease;
 }
 
-.tag:hover, .tag.active {
-  background: var(--border);
-  color: var(--bg);
+.tag:hover,
+.tag.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .post-list {
@@ -192,11 +210,14 @@ h1, h2, h3 {
   border: 2px solid var(--border);
   padding: 24px;
   background: var(--bg);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 4px 4px 0px rgba(240, 84, 35, 0.12);
 }
 
 .post-card:hover {
-  box-shadow: 4px 4px 0px var(--border);
+  border-color: var(--primary);
+  box-shadow: 6px 6px 0px var(--primary);
+  transform: translate(-2px, -2px);
 }
 
 .post-card-content {
@@ -220,13 +241,13 @@ h1, h2, h3 {
 .likes-badge {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--primary);
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .post-card-footer {
@@ -269,8 +290,9 @@ h1, h2, h3 {
 }
 
 .admin-btn:hover {
-  background: var(--border);
-  color: var(--bg);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .post-header-top {
@@ -307,26 +329,30 @@ h1, h2, h3 {
   display: inline-flex;
   align-items: center;
   margin: 16px 0;
-  border: 2px solid var(--border);
+  border: 2px solid var(--primary);
   background: var(--bg);
-  color: var(--text);
+  color: var(--primary);
   padding: 8px 18px;
   cursor: pointer;
   font-family: 'Space Mono', monospace;
   font-weight: 700;
   font-size: 13px;
   transition: all 0.15s ease;
+  box-shadow: 3px 3px 0px var(--primary-light);
 }
 
 .like-button:hover:not(:disabled) {
-  background: var(--border);
-  color: var(--bg);
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 3px 3px 0px var(--primary);
 }
 
 .like-button.liked {
-  background: var(--border);
-  color: var(--bg);
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
   cursor: default;
+  box-shadow: none;
 }
 
 .post-content {
@@ -357,9 +383,11 @@ hr {
 }
 
 .comment {
-  border: 1px solid var(--border);
+  border: 1px solid #e2e2e2;
+  border-left: 3px solid var(--primary);
   padding: 16px;
   background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .comment-header {
@@ -400,6 +428,7 @@ hr {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-shadow: 6px 6px 0px rgba(240, 84, 35, 0.08);
 }
 
 .comment-form label {
@@ -426,6 +455,7 @@ hr {
 .comment-form input:focus,
 .admin-form input:focus,
 .admin-form textarea:focus {
+  border-color: var(--primary);
   border-width: 2px;
 }
 
@@ -444,8 +474,9 @@ hr {
 
 .comment-form button:hover,
 .admin-form button:hover {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .form-actions {
@@ -511,8 +542,9 @@ hr {
 }
 
 .auth-tab.active {
-  background: var(--border);
-  color: var(--bg);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .auth-form {
@@ -529,6 +561,7 @@ hr {
   border: 2px solid var(--border);
   padding: 32px;
   background: var(--bg);
+  box-shadow: 6px 6px 0px rgba(240, 84, 35, 0.08);
 }
 
 .admin-form h1 {
@@ -537,9 +570,9 @@ hr {
 }
 
 .error {
-  color: var(--bg);
-  background: var(--border);
-  border: 1px solid var(--border);
+  color: #ffffff;
+  background: var(--primary);
+  border: 1px solid var(--primary);
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 700;
@@ -548,4 +581,26 @@ hr {
 .empty-state {
   color: var(--muted);
   font-size: 14px;
+}
+
+.views-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e2e2e2;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.floating-character {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 110px;
+  height: 110px;
+  z-index: 9999;
+  pointer-events: none;
 }
