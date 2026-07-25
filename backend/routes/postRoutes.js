@@ -7,7 +7,7 @@ const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware'
 const router = express.Router();
 
 // GET all posts, optional ?tag=xyz filter
-router.get('/', apiLimiter, requireAuth, async (req, res) => {
+router.get('/', apiLimiter, async (req, res) => {
   try {
     const filter = req.query.tag ? { tags: req.query.tag } : {};
     const posts = await Post.find(filter).sort({ createdAt: -1 });
@@ -18,7 +18,7 @@ router.get('/', apiLimiter, requireAuth, async (req, res) => {
 });
 
 // GET all distinct tags (used to build the tag filter bar)
-router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
+router.get('/tags', apiLimiter, async (req, res) => {
   try {
     const tags = await Post.distinct('tags');
     res.json(tags);
@@ -28,7 +28,7 @@ router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
 });
 
 // GET a single post
-router.get('/:id', apiLimiter, requireAuth, async (req, res) => {
+router.get('/:id', apiLimiter, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });

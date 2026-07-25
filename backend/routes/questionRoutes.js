@@ -7,7 +7,7 @@ const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware'
 const router = express.Router();
 
 // GET all questions, optional ?tag=xyz filter
-router.get('/', apiLimiter, requireAuth, async (req, res) => {
+router.get('/', apiLimiter, async (req, res) => {
   try {
     const filter = req.query.tag ? { tags: req.query.tag } : {};
     const questions = await Question.find(filter).sort({ createdAt: -1 });
@@ -18,7 +18,7 @@ router.get('/', apiLimiter, requireAuth, async (req, res) => {
 });
 
 // GET all distinct tags from questions
-router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
+router.get('/tags', apiLimiter, async (req, res) => {
   try {
     const tags = await Question.distinct('tags');
     res.json(tags);
@@ -28,7 +28,7 @@ router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
 });
 
 // GET a single question
-router.get('/:id', apiLimiter, requireAuth, async (req, res) => {
+router.get('/:id', apiLimiter, async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
     if (!question) return res.status(404).json({ message: 'Question not found' });
@@ -78,7 +78,7 @@ router.delete('/:id', writeLimiter, requireAuth, async (req, res) => {
 });
 
 // GET answers for a question
-router.get('/:id/answers', apiLimiter, requireAuth, async (req, res) => {
+router.get('/:id/answers', apiLimiter, async (req, res) => {
   try {
     const answers = await Answer.find({ question: req.params.id }).sort({ createdAt: 1 });
     res.json(answers);

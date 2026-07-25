@@ -7,7 +7,7 @@ const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware'
 const router = express.Router();
 
 // GET all ideas, optional ?tag=xyz filter
-router.get('/', apiLimiter, requireAuth, async (req, res) => {
+router.get('/', apiLimiter, async (req, res) => {
   try {
     const filter = req.query.tag ? { tags: req.query.tag } : {};
     const ideas = await Idea.find(filter).sort({ createdAt: -1 });
@@ -18,7 +18,7 @@ router.get('/', apiLimiter, requireAuth, async (req, res) => {
 });
 
 // GET all distinct tags from ideas
-router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
+router.get('/tags', apiLimiter, async (req, res) => {
   try {
     const tags = await Idea.distinct('tags');
     res.json(tags);
@@ -28,7 +28,7 @@ router.get('/tags', apiLimiter, requireAuth, async (req, res) => {
 });
 
 // GET a single idea
-router.get('/:id', apiLimiter, requireAuth, async (req, res) => {
+router.get('/:id', apiLimiter, async (req, res) => {
   try {
     const idea = await Idea.findById(req.params.id);
     if (!idea) return res.status(404).json({ message: 'Idea not found' });
@@ -103,7 +103,7 @@ router.put('/:id', writeLimiter, requireAuth, async (req, res) => {
 });
 
 // GET suggestions for an idea
-router.get('/:id/suggestions', apiLimiter, requireAuth, async (req, res) => {
+router.get('/:id/suggestions', apiLimiter, async (req, res) => {
   try {
     const suggestions = await Suggestion.find({ idea: req.params.id }).sort({ createdAt: 1 });
     res.json(suggestions);

@@ -6,7 +6,7 @@ const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware'
 const router = express.Router();
 
 // GET comments for a post
-router.get('/:postId', apiLimiter, requireAuth, async (req, res) => {
+router.get('/:postId', apiLimiter, async (req, res) => {
   try {
     const comments = await Comment.find({ post: req.params.postId }).sort({ createdAt: 1 });
     res.json(comments);
