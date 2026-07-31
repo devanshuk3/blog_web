@@ -14,7 +14,7 @@ function IdeaCard({ idea, onDelete }) {
         <div className="post-card-header">
           <h2>{idea.title}</h2>
         </div>
-        <p style={{ fontSize: '12px', color: '#666', margin: '4px 0 12px 0' }}>
+        <p style={{ fontSize: '12px', color: 'var(--info-text)', margin: '4px 0 12px 0' }}>
           Proposed by: <strong>{idea.username}</strong>
         </p>
         <p>{snippet}</p>

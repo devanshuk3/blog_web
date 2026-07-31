@@ -21,7 +21,7 @@ function QuestionCard({ question, onDelete }) {
             )}
           </h2>
         </div>
-        <p style={{ fontSize: '12px', color: '#666', margin: '4px 0 12px 0' }}>
+        <p style={{ fontSize: '12px', color: 'var(--info-text)', margin: '4px 0 12px 0' }}>
           Asked by: <strong>{question.username}</strong>
         </p>
         <p>{snippet}</p>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar() {
@@ -9,6 +9,20 @@ function Navbar() {
   const username = localStorage.getItem('username');
 
   const isAdmin = role === 'admin';
+
+  const [isLight, setIsLight] = useState(() => {
+    return localStorage.getItem('theme') === 'light';
+  });
+
+  useEffect(() => {
+    if (isLight) {
+      document.documentElement.classList.add('light-theme');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+      localStorage.setItem('theme', 'dark');
+    }
+  }, [isLight]);
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -22,10 +36,10 @@ function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" className="brand" onClick={() => setIsOpen(false)}>Devanshu Kumar</Link>
-      
-      <button 
-        type="button" 
-        className="hamburger" 
+
+      <button
+        type="button"
+        className="hamburger"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle menu"
       >
@@ -48,6 +62,9 @@ function Navbar() {
         ) : (
           <Link to="/login" onClick={() => setIsOpen(false)}>SIGN IN</Link>
         )}
+        <button type="button" onClick={() => { setIsLight(!isLight); setIsOpen(false); }}>
+          {isLight ? 'DARK' : 'LIGHT'}
+        </button>
       </div>
     </nav>
   );
