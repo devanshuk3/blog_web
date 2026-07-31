@@ -18,6 +18,16 @@
   --cancel-btn-hover-bg: var(--surface);
   --info-text: var(--muted);
   --border-width: 1.5px;
+  --status-implemented-bg: rgba(46, 117, 89, 0.15);
+  --status-implemented-border: #2e7559;
+  --status-implemented-color: #4cd1a0;
+  --status-failed-bg: rgba(220, 53, 69, 0.15);
+  --status-failed-border: #dc3545;
+  --status-failed-color: #ff6b6b;
+  --liked-answer-bg: rgba(46, 117, 89, 0.1);
+  --liked-answer-border: #2e7559;
+  --select-btn-color: #4cd1a0;
+  --deselect-btn-color: #ff6b6b;
 }
 
 .light-theme {
@@ -40,6 +50,16 @@
   --cancel-btn-hover-bg: #eeeeee;
   --info-text: #666666;
   --border-width: 2px;
+  --status-implemented-bg: #e2f0d9;
+  --status-implemented-border: #385723;
+  --status-implemented-color: #385723;
+  --status-failed-bg: #f8d7da;
+  --status-failed-border: #721c24;
+  --status-failed-color: #721c24;
+  --liked-answer-bg: #f2f9f0;
+  --liked-answer-border: #385723;
+  --select-btn-color: #385723;
+  --deselect-btn-color: #c00000;
 }
 
 * {
@@ -765,4 +785,21 @@ hr {
   justify-content: center;
   border-radius: 50%;
   box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+.badge-implemented {
+  background: var(--status-implemented-bg) !important;
+  border: 1px solid var(--status-implemented-border) !important;
+  color: var(--status-implemented-color) !important;
+}
+
+.badge-failed {
+  background: var(--status-failed-bg) !important;
+  border: 1px solid var(--status-failed-border) !important;
+  color: var(--status-failed-color) !important;
+}
+
+.liked-comment {
+  border: 2px solid var(--liked-answer-border) !important;
+  background: var(--liked-answer-bg) !important;
 }

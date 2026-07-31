@@ -15,7 +15,7 @@ function QuestionCard({ question, onDelete }) {
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             {question.title}
             {question.isAnswered && (
-              <span className="user-role-badge" style={{ backgroundColor: '#e2f0d9', borderColor: '#385723', color: '#385723' }}>
+              <span className="user-role-badge badge-implemented">
                 ANSWERED
               </span>
             )}
@@ -28,19 +28,17 @@ function QuestionCard({ question, onDelete }) {
       </Link>
       <div className="post-card-footer">
         <div className="tags-container">
-          {question.tags.map((tag) => (
-            <span
-              key={tag}
-              className="tag"
-              style={
-                tag.toLowerCase() === 'answered'
-                  ? { backgroundColor: '#e2f0d9', borderColor: '#385723', color: '#385723' }
-                  : {}
-              }
-            >
-              {tag.toUpperCase()}
-            </span>
-          ))}
+          {question.tags.map((tag) => {
+            const isAnsweredTag = tag.toLowerCase() === 'answered';
+            return (
+              <span
+                key={tag}
+                className={`tag ${isAnsweredTag ? 'badge-implemented' : ''}`}
+              >
+                {tag.toUpperCase()}
+              </span>
+            );
+          })}
         </div>
         <span className="date">{date}</span>
         {isOwnerOrAdmin && (

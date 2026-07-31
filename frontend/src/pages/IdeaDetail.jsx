@@ -117,6 +117,15 @@ function IdeaDetail() {
     }
   };
 
+  const handleUpdateStatus = async (newStatus) => {
+    try {
+      const res = await api.patch(`/ideas/${id}/status`, { status: newStatus });
+      setIdea(res.data);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update status');
+    }
+  };
+
   if (loading) {
     return (
       <div className="post-page">
@@ -142,8 +151,23 @@ function IdeaDetail() {
       <div className="post-header-top">
         <Link to="/ideas" className="back-link">← BACK TO IDEAS</Link>
         {isIdeaOwnerOrAdmin && !isEditing && (
-          <div className="admin-actions">
-            <button className="admin-btn edit-btn" style={{ marginRight: '8px' }} onClick={startEditing}>
+          <div className="admin-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {idea.status !== 'implemented' && (
+              <button className="admin-btn" onClick={() => handleUpdateStatus('implemented')}>
+                MARK IMPLEMENTED
+              </button>
+            )}
+            {idea.status !== 'failed' && (
+              <button className="admin-btn" onClick={() => handleUpdateStatus('failed')}>
+                MARK FAILED
+              </button>
+            )}
+            {idea.status !== 'proposed' && (
+              <button className="admin-btn" onClick={() => handleUpdateStatus('proposed')}>
+                MARK PROPOSED
+              </button>
+            )}
+            <button className="admin-btn edit-btn" onClick={startEditing}>
               EDIT IDEA
             </button>
             <button className="admin-btn delete-btn" onClick={handleDeleteIdea}>
@@ -218,7 +242,19 @@ function IdeaDetail() {
         </form>
       ) : (
         <>
-          <h1>{idea.title}</h1>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            {idea.title}
+            {idea.status === 'implemented' && (
+              <span className="user-role-badge badge-implemented" style={{ fontSize: '12px' }}>
+                IMPLEMENTED
+              </span>
+            )}
+            {idea.status === 'failed' && (
+              <span className="user-role-badge badge-failed" style={{ fontSize: '12px' }}>
+                FAILED
+              </span>
+            )}
+          </h1>
 
           <div className="post-meta">
             <span style={{ fontSize: '13px', color: '#666' }}>

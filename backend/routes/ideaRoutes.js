@@ -154,4 +154,28 @@ router.delete('/:id/suggestions/:suggestionId', writeLimiter, requireAuth, async
   }
 });
 
+// PATCH update an idea's status (requires admin or idea owner)
+router.patch('/:id/status', writeLimiter, requireAuth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['proposed', 'implemented', 'failed'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    const idea = await Idea.findById(req.params.id);
+    if (!idea) return res.status(404).json({ message: 'Idea not found' });
+
+    if (req.user.role !== 'admin' && req.user.username !== idea.username) {
+      return res.status(403).json({ message: 'Permission denied' });
+    }
+
+    idea.status = status;
+    await idea.save();
+
+    res.json(idea);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

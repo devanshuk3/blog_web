@@ -133,7 +133,7 @@ function QuestionDetail() {
       <h1 style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         {question.title}
         {question.isAnswered && (
-          <span className="user-role-badge" style={{ backgroundColor: '#e2f0d9', borderColor: '#385723', color: '#385723' }}>
+          <span className="user-role-badge badge-implemented">
             ANSWERED
           </span>
         )}
@@ -143,19 +143,17 @@ function QuestionDetail() {
         <span style={{ fontSize: '13px', color: '#666' }}>
           Asked by: <strong>{question.username}</strong>
         </span>
-        {question.tags && question.tags.map((tag) => (
-          <span
-            key={tag}
-            className="tag"
-            style={
-              tag.toLowerCase() === 'answered'
-                ? { backgroundColor: '#e2f0d9', borderColor: '#385723', color: '#385723' }
-                : {}
-            }
-          >
-            {tag.toUpperCase()}
-          </span>
-        ))}
+        {question.tags && question.tags.map((tag) => {
+          const isAnsweredTag = tag.toLowerCase() === 'answered';
+          return (
+            <span
+              key={tag}
+              className={`tag ${isAnsweredTag ? 'badge-implemented' : ''}`}
+            >
+              {tag.toUpperCase()}
+            </span>
+          );
+        })}
         <span className="date">{new Date(question.createdAt).toLocaleDateString()}</span>
       </div>
 
@@ -185,22 +183,14 @@ function QuestionDetail() {
             return (
               <div
                 key={ans._id}
-                className="comment"
-                style={
-                  ans.isLiked
-                    ? { border: '2px solid #385723', backgroundColor: '#f2f9f0' }
-                    : {}
-                }
+                className={`comment ${ans.isLiked ? 'liked-comment' : ''}`}
               >
                 <div className="comment-header">
                   <strong>{ans.username}</strong>
                   {ans.isLiked && (
                     <span
-                      className="user-role-badge"
+                      className="user-role-badge badge-implemented"
                       style={{
-                        backgroundColor: '#e2f0d9',
-                        borderColor: '#385723',
-                        color: '#385723',
                         fontSize: '10px',
                         padding: '2px 6px',
                       }}
@@ -218,7 +208,7 @@ function QuestionDetail() {
                       type="button"
                       className="reply-link"
                       onClick={() => handleToggleLikeAnswer(ans._id)}
-                      style={{ color: ans.isLiked ? '#c00000' : '#385723', textDecoration: 'underline' }}
+                      style={{ color: ans.isLiked ? 'var(--deselect-btn-color)' : 'var(--select-btn-color)', textDecoration: 'underline' }}
                     >
                       {ans.isLiked ? 'DESELECT ANSWER' : 'SELECT ANSWER'}
                     </button>
