@@ -29,9 +29,9 @@ function App() {
         </Routes>
       </main>
       <div className="floating-character">
-        <img 
-          src="/cat.gif" 
-          alt="Animated Cat" 
+        <img
+          src="/cat.gif"
+          alt="Animated Cat"
           style={{ width: '100%', height: '100%', objectFit: 'contain' }}
         />
       </div>

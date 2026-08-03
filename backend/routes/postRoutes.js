@@ -110,8 +110,8 @@ router.put('/:id', writeLimiter, requireAdmin, async (req, res) => {
   }
 });
 
-// LIKE a post (requires auth)
-router.post('/:id/like', writeLimiter, requireAuth, async (req, res) => {
+// LIKE a post (public)
+router.post('/:id/like', writeLimiter, async (req, res) => {
   try {
     const post = await Post.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } }, { new: true });
     if (!post) return res.status(404).json({ message: 'Post not found' });

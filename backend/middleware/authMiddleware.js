@@ -34,7 +34,22 @@ function requireAdmin(req, res, next) {
   }
 }
 
+function optionalAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'defaultsecret');
+      req.user = decoded;
+    } catch (err) {
+      // Ignore token verification errors to treat the request as anonymous
+    }
+  }
+  next();
+}
+
 module.exports = {
   requireAuth,
   requireAdmin,
+  optionalAuth,
 };

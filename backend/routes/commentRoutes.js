@@ -1,6 +1,6 @@
 const express = require('express');
 const Comment = require('../models/Comment');
-const { requireAuth, requireAdmin } = require('../middleware/authMiddleware');
+const { requireAuth, requireAdmin, optionalAuth } = require('../middleware/authMiddleware');
 const { apiLimiter, writeLimiter } = require('../middleware/rateLimitMiddleware');
 
 const router = express.Router();
@@ -15,11 +15,11 @@ router.get('/:postId', apiLimiter, async (req, res) => {
   }
 });
 
-// ADD a comment (requires auth)
-router.post('/:postId', writeLimiter, requireAuth, async (req, res) => {
+// ADD a comment (public)
+router.post('/:postId', writeLimiter, optionalAuth, async (req, res) => {
   try {
     const { text, replyTo } = req.body;
-    const username = req.user.username || req.body.username;
+    const username = (req.user && req.user.username) || req.body.username;
     if (!username || !text) {
       return res.status(400).json({ message: 'Username and text required' });
     }
