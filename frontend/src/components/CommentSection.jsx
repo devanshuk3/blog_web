@@ -7,7 +7,7 @@ function CommentSection({ postId }) {
   const [username, setUsername] = useState(loggedInUsername || localStorage.getItem('commentUsername') || '');
   const [text, setText] = useState('');
   const [replyTo, setReplyTo] = useState(null);
-  
+
   const role = localStorage.getItem('userRole') || (localStorage.getItem('adminToken') ? 'admin' : null);
   const isAdmin = role === 'admin';
 
@@ -57,6 +57,15 @@ function CommentSection({ postId }) {
     }
   };
 
+  const handleLikeComment = async (commentId) => {
+    try {
+      await api.post(`/comments/${commentId}/like`);
+      loadComments();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to toggle comment like');
+    }
+  };
+
   return (
     <div className="comment-section">
       <h3>{comments.length} COMMENTS</h3>
@@ -65,10 +74,24 @@ function CommentSection({ postId }) {
 
       <div className="comment-list">
         {comments.map((c) => (
-          <div key={c._id} className="comment">
+          <div key={c._id} className={`comment ${c.isLiked ? 'liked-comment' : ''}`}>
             {c.replyTo && <span className="reply-tag">replying to {c.replyTo}</span>}
             <div className="comment-header">
               <strong>{c.username}</strong>
+              {c.isLiked && (
+                <span
+                  className="likes-badge"
+                  style={{
+                    fontSize: '10px',
+                    padding: '2px 8px',
+                    marginLeft: '8px',
+                    borderRadius: '2px',
+                    letterSpacing: '0.05em'
+                  }}
+                >
+                  ♥ LIKED BY AUTHOR
+                </span>
+              )}
               <span className="date">{new Date(c.createdAt).toLocaleString()}</span>
             </div>
             <p>{c.text}</p>
@@ -77,14 +100,30 @@ function CommentSection({ postId }) {
                 REPLY
               </button>
               {isAdmin && (
-                <button
-                  type="button"
-                  className="admin-btn delete-btn"
-                  style={{ marginLeft: '12px', fontSize: '10px' }}
-                  onClick={() => handleDeleteComment(c._id)}
-                >
-                  DELETE
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className="admin-btn"
+                    style={{
+                      marginLeft: '12px',
+                      fontSize: '10px',
+                      borderColor: c.isLiked ? 'var(--primary)' : 'var(--border)',
+                      color: c.isLiked ? 'var(--primary)' : 'var(--text)',
+                      fontWeight: '700'
+                    }}
+                    onClick={() => handleLikeComment(c._id)}
+                  >
+                    {c.isLiked ? 'UNLIKE' : 'LIKE'}
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn delete-btn"
+                    style={{ marginLeft: '8px', fontSize: '10px' }}
+                    onClick={() => handleDeleteComment(c._id)}
+                  >
+                    DELETE
+                  </button>
+                </>
               )}
             </div>
           </div>

@@ -6,6 +6,7 @@ const commentSchema = new mongoose.Schema(
     username: { type: String, required: true },
     text: { type: String, required: true },
     replyTo: { type: String, default: null },
+    isLiked: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -60,8 +60,34 @@ function AdminEdit() {
         onChange={(e) => setTitle(e.target.value)}
         required
       />
+      <div className="image-upload-container">
+        <label className="image-upload-label">IMPORT FROM MARKDOWN (.MD) FILE</label>
+        <input
+          type="file"
+          accept=".md,.markdown,text/markdown,text/plain"
+          className="image-upload-input"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                const text = event.target.result;
+                const firstHeading = text.match(/^#\s+(.*)$/m);
+                if (firstHeading && !title) {
+                  setTitle(firstHeading[1].trim());
+                } else if (!title) {
+                  const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+                  setTitle(nameWithoutExt);
+                }
+                setContent(text);
+              };
+              reader.readAsText(file);
+            }
+          }}
+        />
+      </div>
       <textarea
-        placeholder="Write your post..."
+        placeholder="Write your post (supports GitHub Flavored Markdown)..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={12}

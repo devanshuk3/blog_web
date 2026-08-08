@@ -5,8 +5,12 @@ import LikeButton from '../components/LikeButton.jsx';
 import CommentSection from '../components/CommentSection.jsx';
 import ContentRenderer from '../components/ContentRenderer.jsx';
 
-// Set to track viewed posts in this session and prevent double-incrementing on mount (due to React StrictMode or double renders)
-const viewedPostIds = new Set();
+// Track HMR reloads in dev mode so hot updates can refresh view counts if reloaded
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    sessionStorage.setItem('vite_hmr_reload', 'true');
+  });
+}
 
 function PostPage() {
   const { id } = useParams();
@@ -23,13 +27,24 @@ function PostPage() {
         setPost(res.data);
         setError(null);
 
-        // Increment views count once per mount/session of this post ID
-        if (!viewedPostIds.has(id)) {
-          viewedPostIds.add(id);
+        const viewedKey = `blog_viewed_${id}`;
+        const hasViewed = localStorage.getItem(viewedKey);
+        const isHmrReload = sessionStorage.getItem('vite_hmr_reload') === 'true';
+
+        // Increment views ONLY IF:
+        // 1. A new user/browser visits the post for the first time
+        // OR
+        // 2. The app is hot-reloaded during development (HMR)
+        // Normal page refreshes (F5) will NOT increment the view count.
+        if (!hasViewed || isHmrReload) {
+          if (isHmrReload) {
+            sessionStorage.removeItem('vite_hmr_reload');
+          }
+          localStorage.setItem(viewedKey, 'true');
+
           api.post(`/posts/${id}/view`)
             .then((viewRes) => {
-              // Update local state with the actual incremented views count
-              setPost(prev => prev ? { ...prev, views: viewRes.data.views } : prev);
+              setPost((prev) => (prev ? { ...prev, views: viewRes.data.views } : prev));
             })
             .catch((e) => console.error('Failed to increment view count', e));
         }
@@ -98,10 +113,10 @@ function PostPage() {
       <LikeButton postId={post._id} initialLikes={post.likes} />
       <div className="post-content">
         {post.image && (
-          <img 
-            src={post.image} 
-            alt="Attached" 
-            className="attached-image" 
+          <img
+            src={post.image}
+            alt="Attached"
+            className="attached-image"
           />
         )}
         <ContentRenderer content={post.content} />

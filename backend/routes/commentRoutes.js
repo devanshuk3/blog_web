@@ -36,6 +36,19 @@ router.post('/:postId', writeLimiter, optionalAuth, async (req, res) => {
   }
 });
 
+// LIKE / UNLIKE a comment (admin only)
+router.post('/:commentId/like', writeLimiter, requireAdmin, async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+    comment.isLiked = !comment.isLiked;
+    await comment.save();
+    res.json(comment);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // DELETE a comment (admin only)
 router.delete('/:commentId', writeLimiter, requireAdmin, async (req, res) => {
   try {

@@ -9,10 +9,12 @@ import Questions from './pages/Questions.jsx';
 import QuestionDetail from './pages/QuestionDetail.jsx';
 import Ideas from './pages/Ideas.jsx';
 import IdeaDetail from './pages/IdeaDetail.jsx';
+import BackgroundBlobs from './components/BackgroundBlobs.jsx';
 
 function App() {
   return (
-    <div>
+    <div className="app-wrapper">
+      <BackgroundBlobs />
       <Navbar />
       <main className="container">
         <Routes>
